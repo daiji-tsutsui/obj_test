@@ -192,16 +192,15 @@ void display(void){
 	glEnd();
 	
 	//3d model
-	glPointSize(3.0);
-	glColor3d(0.0, 0.0, 0.0);
-	glBegin(GL_POINTS);
+//	glPointSize(3.0);
+	glColor3d(0.9, 0.4, 0.1);
 	for(int i = 0; i < meshNum; i++){
+		glBegin(GL_POLYGON);
 		for(int j = 0; j < 3; j++){
 			glVertex3d(pos[i][j][0],pos[i][j][1],pos[i][j][2]);
 		}
+		glEnd();
 	}
-	glEnd();
-	
 	
 	glutSwapBuffers();
 }
