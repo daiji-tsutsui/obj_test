@@ -38,7 +38,9 @@ int meshNum = 200;
 
 GLfloat light0pos[] = { 0.0, 3.0, 5.0, 1.0 };
 GLfloat light1pos[] = { 0.0, 3.0, -5.0, 1.0 };
-GLfloat green[] = { 1.0, 1.0, 1.0, 1.0 };
+GLfloat green[] = { 0.0, 1.0, 0.0, 1.0 };
+GLfloat red[] = { 1.0, 0.0, 0.0, 1.0 };
+GLfloat orange[] = { 1.0, 0.7, 0.1, 1.0 };
 
 int main(int argc, char* argv[]) {
 	objl::Loader Loader;
@@ -135,9 +137,11 @@ void setup(void) {
 	glEnable(GL_DEPTH_TEST);
 	glEnable(GL_LIGHTING);
 	glEnable(GL_LIGHT0);
+	glLightfv(GL_LIGHT0, GL_DIFFUSE, orange);
+	glLightfv(GL_LIGHT0, GL_SPECULAR, orange);
 	glEnable(GL_LIGHT1);
-	glLightfv(GL_LIGHT1, GL_DIFFUSE, green);
-	glLightfv(GL_LIGHT1, GL_SPECULAR, green);
+	glLightfv(GL_LIGHT1, GL_DIFFUSE, orange);
+	glLightfv(GL_LIGHT1, GL_SPECULAR, orange);
 }
 void resize(int width, int height) {
 	glViewport(0, 0, width, height);
@@ -175,10 +179,8 @@ void motion(int cx, int cy){
 		glutPostRedisplay();
 	}
 }
-//void init(void){
-//	glClearColor(1.0, 1.0, 1.0, 1.0);
-//
-//}
+
+
 /*--Display func-------------------------------------------------------------------------*/
 void display(void){
 	
@@ -213,8 +215,8 @@ void display(void){
 	//3d model
 //	glPointSize(3.0);
 	glColor3d(0.9, 0.4, 0.1);
-	for(int i = 0; i < meshNum; i++){
-//	for(int i = 0; i < 130; i++){
+//	for(int i = 0; i < meshNum; i++){
+	for(int i = 0; i < 130; i++){
 		glBegin(GL_POLYGON);
 		for(int j = 0; j < 3; j++){
 			glNormal3f(normal[i][j][0],normal[i][j][1],normal[i][j][2]);
