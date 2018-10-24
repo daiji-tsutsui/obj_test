@@ -32,6 +32,8 @@ string username = "tsutsui";
 string filename = "Untitled";
 ostringstream s_input;
 ostringstream s_output;
+double pos[200][3][3] = {0};
+int meshNum = 200;
 
 int main(int argc, char* argv[]) {
 	objl::Loader Loader;
@@ -44,6 +46,7 @@ int main(int argc, char* argv[]) {
 		ofstream file(s_output.str());
 		
 		// Go through each loaded mesh and out its contents
+		/* */meshNum = Loader.LoadedMeshes.size(); if(meshNum >= 200){ meshNum = 200; }
 		for (int i = 0; i < Loader.LoadedMeshes.size(); i++) {
 			// Copy one of the loaded meshes to be our current mesh
 			objl::Mesh curMesh = Loader.LoadedMeshes[i];
@@ -57,6 +60,11 @@ int main(int argc, char* argv[]) {
 				"P(" << curMesh.Vertices[j].Position.X << ", " << curMesh.Vertices[j].Position.Y << ", " << curMesh.Vertices[j].Position.Z << ") " <<
 				"N(" << curMesh.Vertices[j].Normal.X << ", " << curMesh.Vertices[j].Normal.Y << ", " << curMesh.Vertices[j].Normal.Z << ") " <<
 				"TC(" << curMesh.Vertices[j].TextureCoordinate.X << ", " << curMesh.Vertices[j].TextureCoordinate.Y << ")\n";
+				/* */if(i < 200){
+					pos[i][j][0] = curMesh.Vertices[j].Position.X / 10.0;
+					pos[i][j][1] = curMesh.Vertices[j].Position.Y / 10.0 - 1.0;
+					pos[i][j][2] = curMesh.Vertices[j].Position.Z / 10.0;
+				}
 			}
 			
 			// Print Indices
@@ -182,16 +190,17 @@ void display(void){
 	glVertex3d(0.0, 0.0, -2.0);
 	glVertex3d(0.0, 0.0, 2.0);
 	glEnd();
-	//trajectoryの描画
-//	glColor3d((double)k/seqNum, cos((double)i/itrNum), sin((double)i/itrNum));
-//	glBegin(GL_LINES);
-//	glVertex3d(1.0-2.0*(x[k][i-1]-xMin)/(xMax-xMin),
-//			   1.0-2.0*(y[k][i-1]-yMin)/(yMax-yMin),
-//			   1.0-2.0*(z[k][i-1]-zMin)/(zMax-zMin));
-//	glVertex3d(1.0-2.0*(x[k][i]-xMin)/(xMax-xMin),
-//			   1.0-2.0*(y[k][i]-yMin)/(yMax-yMin),
-//			   1.0-2.0*(z[k][i]-zMin)/(zMax-zMin));
-//	glEnd();
+	
+	//3d model
+	glPointSize(3.0);
+	glColor3d(0.0, 0.0, 0.0);
+	glBegin(GL_POINTS);
+	for(int i = 0; i < meshNum; i++){
+		for(int j = 0; j < 3; j++){
+			glVertex3d(pos[i][j][0],pos[i][j][1],pos[i][j][2]);
+		}
+	}
+	glEnd();
 	
 	
 	glutSwapBuffers();
