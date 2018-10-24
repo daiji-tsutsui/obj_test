@@ -33,7 +33,12 @@ string filename = "Untitled";
 ostringstream s_input;
 ostringstream s_output;
 double pos[200][3][3] = {0};
+double normal[200][3][3] = {0};
 int meshNum = 200;
+
+GLfloat light0pos[] = { 0.0, 3.0, 5.0, 1.0 };
+GLfloat light1pos[] = { 0.0, 3.0, -5.0, 1.0 };
+GLfloat green[] = { 1.0, 1.0, 1.0, 1.0 };
 
 int main(int argc, char* argv[]) {
 	objl::Loader Loader;
@@ -64,6 +69,9 @@ int main(int argc, char* argv[]) {
 					pos[i][j][0] = curMesh.Vertices[j].Position.X / 10.0;
 					pos[i][j][1] = curMesh.Vertices[j].Position.Y / 10.0 - 1.0;
 					pos[i][j][2] = curMesh.Vertices[j].Position.Z / 10.0;
+					normal[i][j][0] = curMesh.Vertices[j].Normal.X;
+					normal[i][j][1] = curMesh.Vertices[j].Normal.Y;
+					normal[i][j][2] = curMesh.Vertices[j].Normal.Z;
 				}
 			}
 			
@@ -123,7 +131,13 @@ void idle(void){
 	glutPostRedisplay();
 }
 void setup(void) {
-	glClearColor(1.0, 0.99, 0.91, 1.0);       //White
+	glClearColor(1.0, 1.0, 1.0, 1.0);       //WhiteglEnable(GL_LIGHTING);
+	glEnable(GL_DEPTH_TEST);
+	glEnable(GL_LIGHTING);
+	glEnable(GL_LIGHT0);
+	glEnable(GL_LIGHT1);
+	glLightfv(GL_LIGHT1, GL_DIFFUSE, green);
+	glLightfv(GL_LIGHT1, GL_SPECULAR, green);
 }
 void resize(int width, int height) {
 	glViewport(0, 0, width, height);
@@ -161,7 +175,10 @@ void motion(int cx, int cy){
 		glutPostRedisplay();
 	}
 }
-
+//void init(void){
+//	glClearColor(1.0, 1.0, 1.0, 1.0);
+//
+//}
 /*--Display func-------------------------------------------------------------------------*/
 void display(void){
 	
@@ -171,6 +188,8 @@ void display(void){
 	gluLookAt(r*cos(s)*sin(t), r*sin(s), r*cos(s)*cos(t),
 			  0.0, 0.0, 0.0,
 			  0.0, 1.0, 0.0);
+	glLightfv(GL_LIGHT0, GL_POSITION, light0pos);
+	glLightfv(GL_LIGHT1, GL_POSITION, light1pos);
 	
 	//x-axis
 	glColor3d(1.0, 0.0, 0.0);	//Red
@@ -195,8 +214,10 @@ void display(void){
 //	glPointSize(3.0);
 	glColor3d(0.9, 0.4, 0.1);
 	for(int i = 0; i < meshNum; i++){
+//	for(int i = 0; i < 130; i++){
 		glBegin(GL_POLYGON);
 		for(int j = 0; j < 3; j++){
+			glNormal3f(normal[i][j][0],normal[i][j][1],normal[i][j][2]);
 			glVertex3d(pos[i][j][0],pos[i][j][1],pos[i][j][2]);
 		}
 		glEnd();
