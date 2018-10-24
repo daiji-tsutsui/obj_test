@@ -12,36 +12,23 @@
 
 int main(int argc, char* argv[])
 {
-	// Initialize Loader
 	objl::Loader Loader;
+	bool loadout = Loader.LoadFile("/Users/tsutsui/Documents/C/obj_test/obj_test/Untitled.obj");
 	
-	// Load .obj File
-	bool loadout = Loader.LoadFile("/User/tsutsui/Documents/C/obj_test/obj_test/box_stack.obj");
-	
-	// Check to see if it loaded
-	
-	// If so continue
-	if (loadout)
-	{
+	if (loadout) {
 		// Create/Open e1Out.txt
-		std::ofstream file("/User/tsutsui/Documents/C/obj_test/obj_test/e1Out.txt");
+		std::ofstream file("/Users/tsutsui/Documents/C/obj_test/obj_test/e1Out.txt");
 		
 		// Go through each loaded mesh and out its contents
-		for (int i = 0; i < Loader.LoadedMeshes.size(); i++)
-		{
+		for (int i = 0; i < Loader.LoadedMeshes.size(); i++) {
 			// Copy one of the loaded meshes to be our current mesh
 			objl::Mesh curMesh = Loader.LoadedMeshes[i];
-			
-			// Print Mesh Name
 			file << "Mesh " << i << ": " << curMesh.MeshName << "\n";
-			
-			// Print Vertices
 			file << "Vertices:\n";
 			
 			// Go through each vertex and print its number,
 			//  position, normal, and texture coordinate
-			for (int j = 0; j < curMesh.Vertices.size(); j++)
-			{
+			for (int j = 0; j < curMesh.Vertices.size(); j++) {
 				file << "V" << j << ": " <<
 				"P(" << curMesh.Vertices[j].Position.X << ", " << curMesh.Vertices[j].Position.Y << ", " << curMesh.Vertices[j].Position.Z << ") " <<
 				"N(" << curMesh.Vertices[j].Normal.X << ", " << curMesh.Vertices[j].Normal.Y << ", " << curMesh.Vertices[j].Normal.Z << ") " <<
@@ -53,8 +40,7 @@ int main(int argc, char* argv[])
 			
 			// Go through every 3rd index and print the
 			//	triangle that these indices represent
-			for (int j = 0; j < curMesh.Indices.size(); j += 3)
-			{
+			for (int j = 0; j < curMesh.Indices.size(); j += 3) {
 				file << "T" << j / 3 << ": " << curMesh.Indices[j] << ", " << curMesh.Indices[j + 1] << ", " << curMesh.Indices[j + 2] << "\n";
 			}
 			
@@ -72,27 +58,15 @@ int main(int argc, char* argv[])
 			file << "Specular Texture Map: " << curMesh.MeshMaterial.map_Ks << "\n";
 			file << "Alpha Texture Map: " << curMesh.MeshMaterial.map_d << "\n";
 			file << "Bump Map: " << curMesh.MeshMaterial.map_bump << "\n";
-			
-			// Leave a space to separate from the next mesh
 			file << "\n";
 		}
-		
-		// Close File
 		file.close();
 	}
-	// If not output an error
-	else
-	{
-		// Create/Open e1Out.txt
-		std::ofstream file("/User/tsutsui/Documents/C/obj_test/obj_test/e1Out.txt");
-		
-		// Output Error
+	else {
+		std::ofstream file("/Users/tsutsui/Documents/C/obj_test/obj_test/e1Out.txt");
 		file << "Failed to Load File. May have failed to find it or it was not an .obj file.\n";
-		
-		// Close File
 		file.close();
 	}
 	
-	// Exit the program
 	return 0;
 }
