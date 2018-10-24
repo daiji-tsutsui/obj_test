@@ -7,6 +7,7 @@
 //
 
 #include <iostream>
+#include <sstream>
 #include <fstream>
 #include <cmath>
 #include <OpenGL/OpenGL.h>
@@ -27,14 +28,20 @@ double px, py;
 double t = 0.0; double t0 = 0.0;
 double s = 0.0; double s0 = 0.0;
 double r = 2.5;
+string username = "tsutsui";
+string filename = "Untitled";
+ostringstream s_input;
+ostringstream s_output;
 
 int main(int argc, char* argv[]) {
 	objl::Loader Loader;
-	bool loadout = Loader.LoadFile("/Users/tsutsui/Documents/C/obj_test/obj_test/Untitled.obj");
+	s_input << "/Users/" << username << "/Documents/C/obj_test/obj_test/" << filename << ".obj";
+	bool loadout = Loader.LoadFile(s_input.str());
 	
 	if (loadout) {
 		// Create/Open e1Out.txt
-		std::ofstream file("/Users/tsutsui/Documents/C/obj_test/obj_test/e1Out.txt");
+		s_output << "/Users/" << username << "/Documents/C/obj_test/obj_test/e1Out.txt";
+		ofstream file(s_output.str());
 		
 		// Go through each loaded mesh and out its contents
 		for (int i = 0; i < Loader.LoadedMeshes.size(); i++) {
@@ -80,7 +87,8 @@ int main(int argc, char* argv[]) {
 		file.close();
 	}
 	else {
-		std::ofstream file("/Users/tsutsui/Documents/C/obj_test/obj_test/e1Out.txt");
+		s_output << "/Users/" << username << "/Documents/C/obj_test/obj_test/e1Out.txt";
+		ofstream file(s_output.str());
 		file << "Failed to Load File. May have failed to find it or it was not an .obj file.\n";
 		file.close();
 	}
