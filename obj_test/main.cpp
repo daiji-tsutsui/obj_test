@@ -8,10 +8,27 @@
 
 #include <iostream>
 #include <fstream>
+#include <cmath>
+#include <OpenGL/OpenGL.h>
+#include <GLUT/GLUT.h>
 #include "OBJ_Loader.h"
+using namespace std;
 
-int main(int argc, char* argv[])
-{
+void idle(void);
+void setup(void);
+void resize(int width, int height);
+void timer(int value);
+void mouse(int button, int state, int cx, int cy);
+void motion(int cx, int cy);
+void display(void);
+
+int btnFlg = 0;
+double px, py;
+double t = 0.0; double t0 = 0.0;
+double s = 0.0; double s0 = 0.0;
+double r = 2.5;
+
+int main(int argc, char* argv[]) {
 	objl::Loader Loader;
 	bool loadout = Loader.LoadFile("/Users/tsutsui/Documents/C/obj_test/obj_test/Untitled.obj");
 	
@@ -68,5 +85,106 @@ int main(int argc, char* argv[])
 		file.close();
 	}
 	
+	/*--Main loop-------*/
+	glutInit(&argc, argv);
+	glutInitWindowSize(640, 480);
+	glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGBA | GLUT_DEPTH);
+	glutCreateWindow("3D model test");
+	glutReshapeFunc(resize);
+	glutDisplayFunc(display);
+	glutMouseFunc(mouse);
+	glutMotionFunc(motion);
+//	glutIdleFunc(idle);
+//	glutTimerFunc(100 , timer , 0);
+	setup();
+	glutMainLoop();
+	
 	return 0;
+}
+
+/*--For OpenGL-------------------------------------------------------------------------*/
+void idle(void){
+	glutPostRedisplay();
+}
+void setup(void) {
+	glClearColor(1.0, 0.99, 0.91, 1.0);       //White
+}
+void resize(int width, int height) {
+	glViewport(0, 0, width, height);
+	glMatrixMode(GL_PROJECTION);
+	glLoadIdentity();
+	gluPerspective(45.0,
+				   (double)width/height,
+				   1.0,
+				   100.0);
+	gluLookAt(0.0, 0.0, 2.5,       //Position of Camera
+			  0.0, 0.0, 0.0,        //Position of Object
+			  0.0, 1.0, 0.0);       //Upward direction of Camera
+	glMatrixMode(GL_MODELVIEW);
+}
+void timer(int value) {
+	glutPostRedisplay();
+	glutTimerFunc(30 , timer , 0);
+}
+void mouse(int button, int state, int cx, int cy) {
+	if(button == GLUT_LEFT_BUTTON){
+		if(state == GLUT_DOWN){
+			btnFlg = 1;
+			px = cx; py = cy;
+		}else if(state == GLUT_UP){
+			btnFlg = 0;
+			t0 = t;
+			s0 = s;
+		}
+	}
+}
+void motion(int cx, int cy){
+	if(btnFlg){
+		t = t0 - 0.005 * (cx - px);
+		s = max(min(s0 + 0.005 * (cy - py), M_PI/2), -M_PI/2);
+		glutPostRedisplay();
+	}
+}
+
+/*--Display func-------------------------------------------------------------------------*/
+void display(void){
+	
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+	
+	glLoadIdentity();
+	gluLookAt(r*cos(s)*sin(t), r*sin(s), r*cos(s)*cos(t),
+			  0.0, 0.0, 0.0,
+			  0.0, 1.0, 0.0);
+	
+	//x-axis
+	glColor3d(1.0, 0.0, 0.0);	//Red
+	glBegin(GL_LINES);
+	glVertex3d(-2.0, 0.0, 0.0);
+	glVertex3d(2.0, 0.0, 0.0);
+	glEnd();
+	//y-axis
+	glColor3d(0.0, 1.0, 0.0);	//Green
+	glBegin(GL_LINES);
+	glVertex3d(0.0, -2.0, 0.0);
+	glVertex3d(0.0, 2.0, 0.0);
+	glEnd();
+	//z-axis
+	glColor3d(0.0, 0.0, 1.0);	//Blue
+	glBegin(GL_LINES);
+	glVertex3d(0.0, 0.0, -2.0);
+	glVertex3d(0.0, 0.0, 2.0);
+	glEnd();
+	//trajectoryの描画
+//	glColor3d((double)k/seqNum, cos((double)i/itrNum), sin((double)i/itrNum));
+//	glBegin(GL_LINES);
+//	glVertex3d(1.0-2.0*(x[k][i-1]-xMin)/(xMax-xMin),
+//			   1.0-2.0*(y[k][i-1]-yMin)/(yMax-yMin),
+//			   1.0-2.0*(z[k][i-1]-zMin)/(zMax-zMin));
+//	glVertex3d(1.0-2.0*(x[k][i]-xMin)/(xMax-xMin),
+//			   1.0-2.0*(y[k][i]-yMin)/(yMax-yMin),
+//			   1.0-2.0*(z[k][i]-zMin)/(zMax-zMin));
+//	glEnd();
+	
+	
+	glutSwapBuffers();
 }
