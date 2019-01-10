@@ -29,12 +29,15 @@ double t = 0.0; double t0 = 0.0;
 double s = 0.0; double s0 = 0.0;
 double r = 2.5;
 string username = "tsutsui";
-string filename = "Untitled";
+string filename = "kuriyama_v4";
 ostringstream s_input;
 ostringstream s_output;
-double pos[200][3][3] = {0};
-double normal[200][3][3] = {0};
+double pos[200][30000][3] = {0};
+double normal[200][30000][3] = {0};
+int tri_id[200][30000][3] = {0};
 int meshNum = 200;
+int prec = 0;
+int inc = 1;
 
 GLfloat light0pos[] = { 0.0, 3.0, 5.0, 1.0 };
 GLfloat light1pos[] = { 0.0, 3.0, -5.0, 1.0 };
@@ -46,6 +49,7 @@ int main(int argc, char* argv[]) {
 	objl::Loader Loader;
 	s_input << "/Users/" << username << "/Documents/C/obj_test/obj_test/" << filename << ".obj";
 	bool loadout = Loader.LoadFile(s_input.str());
+	int k = 0;
 	
 	if (loadout) {
 		// Create/Open e1Out.txt
@@ -67,12 +71,12 @@ int main(int argc, char* argv[]) {
 				"P(" << curMesh.Vertices[j].Position.X << ", " << curMesh.Vertices[j].Position.Y << ", " << curMesh.Vertices[j].Position.Z << ") " <<
 				"N(" << curMesh.Vertices[j].Normal.X << ", " << curMesh.Vertices[j].Normal.Y << ", " << curMesh.Vertices[j].Normal.Z << ") " <<
 				"TC(" << curMesh.Vertices[j].TextureCoordinate.X << ", " << curMesh.Vertices[j].TextureCoordinate.Y << ")\n";
-				/* */if(i < 200){
+				/* */if(i < 200 && j < 30000){
 					pos[i][j][0] = curMesh.Vertices[j].Position.X / 10.0;
-					pos[i][j][1] = curMesh.Vertices[j].Position.Y / 10.0 - 1.0;
+					pos[i][j][1] = -curMesh.Vertices[j].Position.Y / 10.0;
 					pos[i][j][2] = curMesh.Vertices[j].Position.Z / 10.0;
 					normal[i][j][0] = curMesh.Vertices[j].Normal.X;
-					normal[i][j][1] = curMesh.Vertices[j].Normal.Y;
+					normal[i][j][1] = -curMesh.Vertices[j].Normal.Y;
 					normal[i][j][2] = curMesh.Vertices[j].Normal.Z;
 				}
 			}
@@ -84,6 +88,12 @@ int main(int argc, char* argv[]) {
 			//	triangle that these indices represent
 			for (int j = 0; j < curMesh.Indices.size(); j += 3) {
 				file << "T" << j / 3 << ": " << curMesh.Indices[j] << ", " << curMesh.Indices[j + 1] << ", " << curMesh.Indices[j + 2] << "\n";
+				/* */if(i < 200){
+					tri_id[i][k][0] = curMesh.Indices[j];
+					tri_id[i][k][1] = curMesh.Indices[j+1];
+					tri_id[i][k][2] = curMesh.Indices[j+2];
+					++k;
+				}
 			}
 			
 			// Print Material
@@ -121,7 +131,7 @@ int main(int argc, char* argv[]) {
 	glutMouseFunc(mouse);
 	glutMotionFunc(motion);
 //	glutIdleFunc(idle);
-//	glutTimerFunc(100 , timer , 0);
+	glutTimerFunc(100 , timer , 0);
 	setup();
 	glutMainLoop();
 	
@@ -157,8 +167,11 @@ void resize(int width, int height) {
 	glMatrixMode(GL_MODELVIEW);
 }
 void timer(int value) {
+	prec += inc;
+	if(prec > 10500){ inc = -1; }
+	if(prec <= 0){ inc = 1; }
 	glutPostRedisplay();
-	glutTimerFunc(30 , timer , 0);
+	glutTimerFunc(1 , timer , 0);
 }
 void mouse(int button, int state, int cx, int cy) {
 	if(button == GLUT_LEFT_BUTTON){
@@ -215,14 +228,16 @@ void display(void){
 	//3d model
 //	glPointSize(3.0);
 	glColor3d(0.9, 0.4, 0.1);
-//	for(int i = 0; i < meshNum; i++){
-	for(int i = 0; i < 130; i++){
-		glBegin(GL_POLYGON);
-		for(int j = 0; j < 3; j++){
-			glNormal3f(normal[i][j][0],normal[i][j][1],normal[i][j][2]);
-			glVertex3d(pos[i][j][0],pos[i][j][1],pos[i][j][2]);
+	for(int i = 0; i < meshNum; i++){
+//	for(int i = 0; i < 130; i++){	//for Untitled.obj
+		for(int k = 0; k < prec; k++){
+			glBegin(GL_TRIANGLES);
+			for(int l = 0; l < 3; l++){
+				glNormal3f(normal[i][tri_id[i][k][l]][0],normal[i][tri_id[i][k][l]][1],normal[i][tri_id[i][k][l]][2]);
+				glVertex3d(pos[i][tri_id[i][k][l]][0],pos[i][tri_id[i][k][l]][1],pos[i][tri_id[i][k][l]][2]);
+			}
+			glEnd();
 		}
-		glEnd();
 	}
 	
 	glutSwapBuffers();
